@@ -1,0 +1,6 @@
+# dsh-nga-sidebar bundle patch: mounts the host half (NGA proxy routes);
+# the dsh.client manifest in package.json lets the Web module host discover
+# the browser half, which renders the forum panel in the sidebar.
+- insert:
+    - id: dsh-nga
+      name: dsh-nga-sidebar

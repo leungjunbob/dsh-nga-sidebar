@@ -1,0 +1,12 @@
+# dependencies
+node_modules/
+
+# build artifacts (lib/ is committed for dsh plugin installs — do NOT ignore)
+# *.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
