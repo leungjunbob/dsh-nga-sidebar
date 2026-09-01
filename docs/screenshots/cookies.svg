@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <rect width="100%" height="100%" fill="#16161a"/>
+  <rect x="20" y="14" width="600" height="332" rx="8" fill="#1b1b21" stroke="#2c2c34"/>
+  <rect x="36" y="30" width="60" height="24" rx="6" fill="#22222a" stroke="#3a3a44"/>
+  <text x="110" y="47" fill="#e8e8ec" font-family="system-ui, sans-serif" font-size="15">NGA 登录 Cookie</text>
+  <rect x="36" y="70" width="568" height="16" rx="4" fill="#24242c"/>
+  <text x="46" y="108" fill="#cfcfd6" font-family="system-ui, sans-serif" font-size="12">ngaPassportUid（账号 UID）</text>
+  <rect x="36" y="116" width="568" height="34" rx="6" fill="#1d1d23" stroke="#3a3a44"/>
+  <text x="46" y="156" fill="#cfcfd6" font-family="system-ui, sans-serif" font-size="12">ngaPassportCid（会话凭证）</text>
+  <rect x="36" y="164" width="568" height="34" rx="6" fill="#1d1d23" stroke="#3a3a44"/>
+  <rect x="36" y="214" width="120" height="32" rx="6" fill="#3b5bdb"/>
+  <text x="96" y="234" fill="#fff" font-family="system-ui, sans-serif" font-size="13" text-anchor="middle">保存</text>
+  <text x="50%" y="286" fill="#8b8b98" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">（示例：面板内填写 Cookie，零命令行配置）</text>
+</svg>

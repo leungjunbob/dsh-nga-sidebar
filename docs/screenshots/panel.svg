@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <rect width="100%" height="100%" fill="#16161a"/>
+  <rect x="16" y="14" width="200" height="332" rx="8" fill="#1e1e24" stroke="#2c2c34"/>
+  <rect x="40" y="34" width="150" height="16" rx="8" fill="#22222a" stroke="#3a3a44"/>
+  <rect x="40" y="58" width="150" height="16" rx="8" fill="#2a3a6e"/>
+  <rect x="40" y="82" width="150" height="16" rx="8" fill="#22222a" stroke="#3a3a44"/>
+  <rect x="40" y="106" width="150" height="16" rx="8" fill="#22222a" stroke="#3a3a44"/>
+  <rect x="232" y="14" width="392" height="332" rx="8" fill="#1b1b21" stroke="#2c2c34"/>
+  <rect x="250" y="34" width="280" height="14" rx="4" fill="#3b3b44"/>
+  <rect x="250" y="60" width="356" height="46" rx="6" fill="#202028" stroke="#232329"/>
+  <rect x="250" y="116" width="356" height="46" rx="6" fill="#202028" stroke="#232329"/>
+  <rect x="250" y="172" width="356" height="46" rx="6" fill="#202028" stroke="#232329"/>
+  <text x="50%" y="270" fill="#e8e8ec" font-family="system-ui, sans-serif" font-size="18" text-anchor="middle">截图占位：侧栏面板（板块列表 + 帖子列表）</text>
+  <text x="50%" y="298" fill="#8b8b98" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">替换 docs/screenshots/panel.svg 为真实截图（如 panel.png），并更新本 README 的引用</text>
+</svg>

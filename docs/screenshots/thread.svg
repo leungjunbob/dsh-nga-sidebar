@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <rect width="100%" height="100%" fill="#16161a"/>
+  <rect x="20" y="14" width="600" height="332" rx="8" fill="#1b1b21" stroke="#2c2c34"/>
+  <rect x="36" y="30" width="60" height="24" rx="6" fill="#22222a" stroke="#3a3a44"/>
+  <rect x="110" y="34" width="200" height="16" rx="4" fill="#3b3b44"/>
+  <rect x="36" y="66" width="568" height="18" rx="4" fill="#24242c"/>
+  <rect x="36" y="96" width="120" height="14" rx="4" fill="#2c3a5e"/>
+  <rect x="170" y="96" width="60" height="14" rx="4" fill="#3b3b44"/>
+  <rect x="36" y="118" width="568" height="70" rx="6" fill="#202028" stroke="#232329"/>
+  <rect x="36" y="200" width="568" height="70" rx="6" fill="#202028" stroke="#232329"/>
+  <rect x="36" y="282" width="568" height="44" rx="6" fill="#1d1d23" stroke="#3a3a44"/>
+  <text x="50%" y="260" fill="#8b8b98" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">（示例：作者 + 楼层 + 正文 + 图片渲染）</text>
+</svg>
