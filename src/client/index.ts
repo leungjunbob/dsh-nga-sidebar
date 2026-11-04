@@ -81,16 +81,17 @@ async function fetchForums(signal: AbortSignal): Promise<NgaForum[]> {
   }
 }
 
-async function fetchThreads(fid: string, page: number, signal: AbortSignal): Promise<{ threads: NgaThread[]; forumName?: string; error?: string; needCookies?: boolean }> {
+async function fetchThreads(fid: string, page: number, signal: AbortSignal): Promise<{ threads: NgaThread[]; forumName?: string; error?: string; needCookies?: boolean; hasNext?: boolean }> {
   try {
     const res = await fetch(`${THREADS_ROUTE}?fid=${encodeURIComponent(fid)}&page=${page}`, { signal })
     if (!res.ok) return { threads: [], error: `请求失败 (HTTP ${res.status})` }
-    const data = await res.json() as { threads?: unknown; forumName?: unknown; error?: unknown; needCookies?: unknown }
+    const data = await res.json() as { threads?: unknown; forumName?: unknown; error?: unknown; needCookies?: unknown; hasNext?: unknown }
     return {
       threads: Array.isArray(data.threads) ? data.threads as NgaThread[] : [],
       forumName: typeof data.forumName === 'string' ? data.forumName : undefined,
       error: typeof data.error === 'string' ? data.error : undefined,
       needCookies: data.needCookies === true,
+      hasNext: data.hasNext === true,
     }
   } catch {
     return { threads: [], error: '网络错误' }
@@ -148,6 +149,8 @@ const css = `
 .nga-add input{width:64px;background:#1d1d23;border:1px solid #3a3a44;color:#e8e8ec;border-radius:6px;padding:3px 7px;font-size:12px;min-width:0}
 .nga-add button{border:1px solid #3a3a44;background:#22222a;color:#e8e8ec;border-radius:6px;padding:3px 9px;cursor:pointer;font-size:12px}
 .nga-add button:hover{background:#2e2e38}
+.nga-list-wrap{flex:1;min-height:0;display:flex;flex-direction:column}
+.nga-list-wrap>.nga-pager{flex:0 0 auto;border-bottom:0;border-top:1px solid #2c2c34}
 .nga-list{flex:1;min-height:0;overflow-y:auto;padding:2px 0}
 .nga-thread{display:block;padding:8px 12px;border-bottom:1px solid #232329;cursor:pointer;text-decoration:none;color:inherit}
 .nga-thread:hover{background:#202028}
@@ -203,7 +206,13 @@ function NgaPanel(): React.ReactElement {
   const [customForums, setCustomForums] = useState<NgaForum[]>(readCustomForums)
   const [liveForums, setLiveForums] = useState<NgaForum[] | null>(null)
   const [fid, setFid] = useState<string>(() => readActiveFid())
-  const [page] = useState(1)
+  const [page, setPage] = useState(1)
+  /**
+   * Whether the current board has a page after this one. NGA's thread list
+   * does not report a total, so the host tells us whether the last row was a
+   * full page — the only reliable signal that a next page may exist.
+   */
+  const [hasNext, setHasNext] = useState(false)
   const [threads, setThreads] = useState<NgaThread[] | null>(null)
   const [forumName, setForumName] = useState<string | undefined>(undefined)
   const [threadError, setThreadError] = useState<string | undefined>(undefined)
@@ -257,6 +266,7 @@ function NgaPanel(): React.ReactElement {
       setForumName(result.forumName)
       setThreadError(result.error)
       setNeedCookies(result.needCookies === true)
+      setHasNext(result.hasNext === true)
       if (result.forumName !== undefined) adoptForumName(fid, result.forumName)
       setStatus('idle')
     }).catch(() => {
@@ -266,8 +276,14 @@ function NgaPanel(): React.ReactElement {
     return () => controller.abort()
   }, [fid, page])
 
-  const refresh = useCallback((): void => {
-    if (fid === '') return
+  /** Switch board, always starting from the first page. */
+  const selectForum = useCallback((nextFid: string): void => {
+    setPage(1)
+    setHasNext(false)
+    setFid(nextFid)
+  }, [])
+
+  const refresh = useCallback((): void => {    if (fid === '') return
     const seq = ++reloadSeqRef.current
     const controller = new AbortController()
     setStatus('loading')
@@ -279,6 +295,7 @@ function NgaPanel(): React.ReactElement {
       setForumName(result.forumName)
       setThreadError(result.error)
       setNeedCookies(result.needCookies === true)
+      setHasNext(result.hasNext === true)
       if (result.forumName !== undefined) adoptForumName(fid, result.forumName)
     }).catch(() => {
       if (controller.signal.aborted || seq !== reloadSeqRef.current) return
@@ -563,7 +580,7 @@ function NgaPanel(): React.ReactElement {
             'aria-selected': forum.fid === fid,
             'data-active': forum.fid === fid ? true : undefined,
             title: `${forum.name} (fid=${forum.fid})`,
-            onClick: () => setFid(forum.fid),
+            onClick: () => selectForum(forum.fid),
           },
             createElement('span', null, forum.name),
             createElement('span', { className: 'nga-fid-hint' }, `fid=${forum.fid}`),
@@ -607,23 +624,42 @@ function NgaPanel(): React.ReactElement {
           : threads.length === 0
             ? createElement('div', { className: 'nga-empty' },
               threadError !== undefined ? threadError : '这个板块暂时没有帖子')
-            : createElement('div', { className: 'nga-list', role: 'list' },
-              ...threads.map(thread => createElement('a', {
-                key: thread.tid,
-                className: 'nga-thread',
-                role: 'listitem',
-                href: `https://bbs.nga.cn/read.php?tid=${thread.tid}`,
-                target: '_blank',
-                rel: 'noopener',
-                onClick: (e: React.MouseEvent) => { e.preventDefault(); openThreadView(thread.tid) },
-              },
-                createElement('div', { className: 'nga-thread-title' }, thread.title),
-                createElement('div', { className: 'nga-thread-meta' },
-                  createElement('span', null, thread.author === '' ? '未知作者' : thread.author),
-                  createElement('span', null, thread.reply >= 0 ? `${thread.reply} 回复` : ''),
-                  createElement('span', { style: { marginLeft: 'auto' } }, '阅读 ›'),
-                ),
-              )),
+            : createElement('div', { className: 'nga-list-wrap' },
+              createElement('div', { className: 'nga-list', role: 'list' },
+                ...threads.map(thread => createElement('a', {
+                  key: thread.tid,
+                  className: 'nga-thread',
+                  role: 'listitem',
+                  href: `https://bbs.nga.cn/read.php?tid=${thread.tid}`,
+                  target: '_blank',
+                  rel: 'noopener',
+                  onClick: (e: React.MouseEvent) => { e.preventDefault(); openThreadView(thread.tid) },
+                },
+                  createElement('div', { className: 'nga-thread-title' }, thread.title),
+                  createElement('div', { className: 'nga-thread-meta' },
+                    createElement('span', null, thread.author === '' ? '未知作者' : thread.author),
+                    createElement('span', null, thread.reply >= 0 ? `${thread.reply} 回复` : ''),
+                    createElement('span', { style: { marginLeft: 'auto' } }, '阅读 ›'),
+                  ),
+                )),
+              ),
+              // Board paging: NGA reports no page count, so 下一页 shows only
+              // when the host confirmed the following page has topics.
+              createElement('div', { className: 'nga-pager' },
+                createElement('button', {
+                  className: 'nga-back',
+                  type: 'button',
+                  disabled: page <= 1 || status === 'loading',
+                  onClick: () => { setPage(p => Math.max(1, p - 1)) },
+                }, '← 上一页'),
+                createElement('span', { className: 'nga-pager-info' }, `第 ${page} 页`),
+                createElement('button', {
+                  className: 'nga-back',
+                  type: 'button',
+                  disabled: !hasNext || status === 'loading',
+                  onClick: () => { setPage(p => p + 1) },
+                }, '下一页 →'),
+              ),
             ),
   )
 }

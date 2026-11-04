@@ -37,6 +37,12 @@ export interface ThreadsPayload {
     readonly error?: string;
     /** True when no NGA login cookies are configured on the host. */
     readonly needCookies?: boolean;
+    /**
+     * True when another page of threads probably follows. NGA's board listing
+     * reports no page count, so the host can only signal "the page was full",
+     * which is what enables the 下一页 button. Absent means unknown/empty.
+     */
+    readonly hasNext?: boolean;
     readonly threads: readonly NgaThread[];
 }
 /** One post (主楼或回复) in a thread. */
